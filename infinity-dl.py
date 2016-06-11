@@ -28,10 +28,11 @@ def main():
 	progress("Downloading... \n")
 	for tags in soup.find_all("div", {"class" : "file"}):
 		for span in tags.find_all("p", {"class" : "fileinfo"}):
+			for post_file_name  in span.find_all("span", {"class": "postfilename"}):
+				filenames = post_file_name.get_text()
 			for a_tags in span.find_all("a"):
 				media_list = a_tags.get("href")
-				filenames = a_tags.get_text()
-				r = requests.get(media_list, stream=True, verify=False)
+				r = requests.get(media_list, stream=True, verify=True)
 				with open(filenames, "wb") as out_file:
 					shutil.copyfileobj(r.raw, out_file)
 				del r
