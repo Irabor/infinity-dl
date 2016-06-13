@@ -4,7 +4,8 @@ import sys, shutil, requests, time, os
 argv = sys.argv
 infin = "8ch.net"
 _7ch = "7chan.org"
-server_err = [404, 401, 500, 403, 400]
+_4chan = '4chan.org'
+server_err = [404, 401, 500, 502, 403, 400]
 def _err_(err):
 	sys.stderr.write(err)
 def progress(pro):
@@ -49,6 +50,24 @@ def _8ch_scraper():
 					with open(filenames, "wb") as out_file:
 						shutil.copyfileobj(r.raw, out_file)
 					del r
+def _4chan_scraper():
+	url = requests.get(argv[1], verify=True)
+	for errors in server_err:
+		if url.status_code == errors:
+			_err_(str(url.status_code) + " Error\n")
+			sys.exit()
+	parse_html = BeautifulSoup(url.text, "lxml")
+	for tags in parse_html.find_all("div", {"class": "fileText"}):
+		for a_tags in tags.find_all("a"):
+			usplit_link = a_tags.get("href")
+			media_list_url = "https://" + usplit_link.split("//")[-1]
+			filenames = a_tags.get_text()
+			get_files = requests.get(media_list_url, stream= True, verify=True)
+			progress("Downloading " + filenames + " ......\n")
+			progress(".......................................\n")
+			with open(filenames, "wb")as outfile:
+				shutil.copyfileobj(get_files.raw, outfile)
+			del get_files
 def main():
 	if len(argv) > 2 :
 		_err_("Usage: " + argv[0] + " [URL]\n")
@@ -59,12 +78,19 @@ def main():
 	if infin in argv[1]:
 		progress("\033[32m\033[5mSending request...\n")
 		progress("\033[0m\033[0m \n")
-		progress("  \n")
 		_8ch_scraper()
 	if _7ch in argv[1]:
-			progress("\033[32m\033[5mSending request...\n")
-			progress("\033[0m\033[0m \n")
-			progress("  \n")
-			_7ch_scraper()
+		progress("\033[32m\033[5mSending request...\n")
+		progress("\033[0m\033[0m \n")
+		_7ch_scraper()
+	if _4chan in argv[1]:
+		progress("\033[32m\033[5mSending request...\n")
+		progress("\033[0m\033[0m \n")
+		_4chan_scraper()
 if __name__ == "__main__":
-	main()
+	try:
+		main()
+	except KeyboardInterrupt:
+		progress("  \n")
+		progress("\033[31mDownload interrupted\n")
+		sys.exit()
