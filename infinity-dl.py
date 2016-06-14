@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from bs4 import BeautifulSoup
 import sys, shutil, requests, time, os
+
 argv = sys.argv
 infin = "8ch.net"
 _7ch = "7chan.org"
@@ -31,6 +32,7 @@ def _7ch_scraper():
 					progress("Downloading " + filenames + " ......\n")
 					with open(filenames, "wb")as outfile:
 						shutil.copyfileobj(get_files.raw, outfile)
+						shutil.move(filenames, argv[2])
 					del get_files
 def _8ch_scraper():
 		url = requests.get(argv[1], verify=True)
@@ -49,6 +51,7 @@ def _8ch_scraper():
 					progress("Downloading " + filenames + " ......\n")
 					with open(filenames, "wb") as out_file:
 						shutil.copyfileobj(r.raw, out_file)
+						shutil.move(filenames, argv[2])
 					del r
 def _4chan_scraper():
 	url = requests.get(argv[1], verify=True)
@@ -63,17 +66,21 @@ def _4chan_scraper():
 			media_list_url = "https://" + usplit_link.split("//")[-1]
 			filenames = a_tags.get_text()
 			get_files = requests.get(media_list_url, stream= True, verify=True)
-			progress("Downloading " + filenames + " ......\n")
+			count = 0
+			count = count + 1
+			count = str(count)
+			progress("Downloading "+ filenames + " ......\n")
 			progress(".......................................\n")
 			with open(filenames, "wb")as outfile:
 				shutil.copyfileobj(get_files.raw, outfile)
+				shutil.move(filenames, argv[2])
 			del get_files
 def main():
-	if len(argv) > 2 :
-		_err_("Usage: " + argv[0] + " [URL]\n")
+	if (len(argv) > 3) and (os.path.isdir(argv[2]) == False):
+		_err_("Usage: " + argv[0] + " [URL] [DIR]\n")
 		sys.exit()
-	elif len(argv) < 2 :
-		_err_("Usage: " + argv[0] + " [URL]\n")
+	elif (len(argv) < 3) or (os.path.isdir(argv[2]) == False):
+		_err_("Usage: " + argv[0] + " [URL] [DIR]\n")
 		sys.exit()
 	if infin in argv[1]:
 		progress("\033[32m\033[5mSending request...\n")
@@ -87,10 +94,11 @@ def main():
 		progress("\033[32m\033[5mSending request...\n")
 		progress("\033[0m\033[0m \n")
 		_4chan_scraper()
+
 if __name__ == "__main__":
 	try:
 		main()
-	except KeyboardInterrupt:
+	except KeyboardInterrupt or IndexError:
 		progress("  \n")
 		progress("\033[31mDownload interrupted\n")
 		sys.exit()
