@@ -5,6 +5,14 @@ import sys, shutil, requests, time, os, random
 argv = sys.argv
 chan_list = ["8ch.net", "hispachan.org", "4chan.org", "7chan.org", "endchan.xyz"]
 server_err = [404, 401, 500, 502, 403, 400]
+user_agent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1"
+HEADERS = {
+	"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+	"User-Agent": user_agent,
+	"Accept-Encoding": "gzip, deflate",
+	"Connection": "keep-alive",
+
+}
 def _err_():
 	sys.stderr.write("Usage: " + argv[0] + " [URL] [DIR]\n")
 def send_request():
@@ -16,7 +24,7 @@ def send_request():
 	sys.stdout.flush()
 def server_status_err():
     global url
-    url = requests.get(argv[1], verify=True)
+    url = requests.get(argv[1], verify=True, headers=HEADERS)
     for errors in server_err:
         if url.status_code == errors:
             print(str(url.status_code)  + " Error\n")
