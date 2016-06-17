@@ -1,6 +1,6 @@
 # infinity-dl
 ### Description
-ifinity-dl downloads all images or videos on 4chan, hispanchan, 8ch and 7chan threads and saves them in a specified directory
+ifinity-dl downloads all images or videos on 4chan, hispanchan, 8ch, endchan and 7chan threads and saves them in a specified directory
 ```
 infinity-dl.py [URL] [DIR]
 ```

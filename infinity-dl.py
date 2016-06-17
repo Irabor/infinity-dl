@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import sys, shutil, requests, time, os, random
 
 argv = sys.argv
-chan_list = ["8ch.net", "hispachan.org", "4chan.org", "7chan.org"]
+chan_list = ["8ch.net", "hispachan.org", "4chan.org", "7chan.org", "endchan.xyz"]
 server_err = [404, 401, 500, 502, 403, 400]
 def _err_():
 	sys.stderr.write("Usage: " + argv[0] + " [URL] [DIR]\n")
@@ -37,7 +37,6 @@ def _7ch_scraper():
 					with open(filenames, "wb")as outfile:
 						shutil.copyfileobj(get_files.raw, outfile)
 						shutil.move(filenames, argv[2])
-					del get_files
 def _8ch_scraper():
 		server_status_err()
 		parse_html = BeautifulSoup(url.text, "lxml")
@@ -55,7 +54,6 @@ def _8ch_scraper():
 					with open(filenames, "wb") as out_file:
 						shutil.copyfileobj(r.raw, out_file)
 						shutil.move(filenames, argv[2])
-					del r
 def _4chan_scraper():
 	server_status_err()
 	parse_html = BeautifulSoup(url.text, "lxml")
@@ -72,7 +70,6 @@ def _4chan_scraper():
 			with open(filenames, "wb")as outfile:
 				shutil.copyfileobj(get_files.raw, outfile)
 				shutil.move(filenames, argv[2])
-			del get_files
 def hispanchan():
 		server_status_err()
 		parse_html = BeautifulSoup(url.text, "lxml")
@@ -88,6 +85,20 @@ def hispanchan():
 				with open(filenames, 'wb')as outfile:
 					shutil.move(filenames, argv[2])
 					shutil.copyfileobj(get_files.raw, outfile)
+def endchan():
+	server_status_err()
+	parse_html = BeautifulSoup(url.text, 'lxml')
+	for a_tags in parse_html.find_all('a',{'class': 'originalNameLink'}):
+		media_list_url = "https://endchan.xyz" + a_tags.get('href')
+		filenames = a_tags.get('href').split("/")[-1]
+		change_filename = random.randint(1, 1000)
+		change_filename = str(change_filename)
+		filenames = change_filename + filenames
+		get_files = requests.get(media_list_url, stream=True, verify=True)
+		print("Downloading "+ filenames)
+		with open(filenames, 'wb')as outfile:
+			shutil.copyfileobj(get_files.raw, outfile)
+			shutil.move(filenames, argv[2])
 def main():
 	if (len(argv) > 3) and (os.path.isdir(argv[2]) == False):
 		_err_()
@@ -100,6 +111,7 @@ def main():
 			send_request()
 			_4chan_scraper()
 			_8ch_scraper()
+			endchan()
 if __name__ == "__main__":
 	try:
 		main()
