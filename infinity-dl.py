@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from bs4 import BeautifulSoup
-import sys, shutil, requests, time, os, random
+import sys, shutil, requests, time, os, random, urllib
 
 argv = sys.argv
 chan_list = ["8ch.net", "hispachan.org", "4chan.org", "7chan.org", "endchan.xyz", "16chan.nl"]
@@ -43,8 +43,8 @@ def _7ch_scraper():
 					get_files = requests.get(url, stream=True, verify=True, headers=HEADERS)
 					print("Downloading " + filenames)
 					with open(filenames, "wb")as outfile:
-						shutil.copyfileobj(get_files.raw, outfile)
-						shutil.move(filenames, argv[2])
+						outfile.write(get_files.content)
+					shutil.move(filenames, argv[2])
 def _8ch_scraper():
 		server_status_err()
 		parse_html = BeautifulSoup(url.text, "lxml")
@@ -54,14 +54,12 @@ def _8ch_scraper():
 					filenames = post_file_name.get_text()
 				for a_tags in span.find_all("a"):
 					media_list = a_tags.get("href")
-					change_filename = random.randint(1,1000)
-					change_filename = str(change_filename)
-					filenames = change_filename + filenames
-					r = requests.get(media_list, stream=True, verify=True, headers=HEADERS)
+					filenames = a_tags.get_text()
 					print("Downloading " + filenames)
-					with open(filenames, "wb") as out_file:
-						shutil.copyfileobj(r.raw, out_file)
-						shutil.move(filenames, argv[2])
+					get_files = requests.get(media_list, stream=True, verify=True, headers=HEADERS)
+					with open(filenames, 'wb')as f:
+						f.write(get_files.content)
+					shutil.move(filenames, argv[2])
 def _4chan_scraper():
 	server_status_err()
 	parse_html = BeautifulSoup(url.text, "lxml")
@@ -76,8 +74,8 @@ def _4chan_scraper():
 			get_files = requests.get(media_list_url, stream= True, verify=True, headers=HEADERS)
 			print("Downloading "+ filenames)
 			with open(filenames, "wb")as outfile:
-				shutil.copyfileobj(get_files.raw, outfile)
-				shutil.move(filenames, argv[2])
+				outfile.write(get_files.content)
+			shutil.move(filenames, argv[2])
 def hispanchan():
 		server_status_err()
 		parse_html = BeautifulSoup(url.text, "lxml")
@@ -91,8 +89,8 @@ def hispanchan():
 				get_files = requests.get(media_list_url, stream=True, verify=True, headers=HEADERS)
 				print("Downloading "+ filenames)
 				with open(filenames, 'wb')as outfile:
-					shutil.move(filenames, argv[2])
-					shutil.copyfileobj(get_files.raw, outfile)
+					outfile.write(get_files.content)
+				shutil.move(filenames, argv[2])
 def endchan():
 	server_status_err()
 	parse_html = BeautifulSoup(url.text, 'lxml')
@@ -105,8 +103,8 @@ def endchan():
 		get_files = requests.get(media_list_url, stream=True, verify=True, headers=HEADERS)
 		print("Downloading "+ filenames)
 		with open(filenames, 'wb')as outfile:
-			shutil.copyfileobj(get_files.raw, outfile)
-			shutil.move(filenames, argv[2])
+			outfile.write(get_files.content)
+		shutil.move(filenames, argv[2])
 def _16chan():
 	server_status_err()
 	parse_html = BeautifulSoup(url.text, 'lxml')
@@ -120,8 +118,8 @@ def _16chan():
 		get_files = requests.get(media_list_url, stream=True, verify=True, headers=HEADERS)
 		print("Downloading "+ filenames)
 		with open(filenames, 'wb')as f:
-			shutil.copyfileobj(get_files.raw, f)
-			shutil.move(filenames, argv[2])
+			f.write(get_files.content)
+		shutil.move(filenames, argv[2])
 def main():
 	if (len(argv) > 3) and (os.path.isdir(argv[2]) == False):
 		_err_()
