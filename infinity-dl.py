@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import sys, shutil, requests, time, os, random
 
 argv = sys.argv
-chan_list = ["8ch.net", "hispachan.org", "4chan.org", "7chan.org", "endchan.xyz"]
+chan_list = ["8ch.net", "hispachan.org", "4chan.org", "7chan.org", "endchan.xyz", "16chan.nl"]
 server_err = [404, 401, 500, 502, 403, 400]
 user_agent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1"
 HEADERS = {
@@ -40,7 +40,7 @@ def _7ch_scraper():
 				file_names.append(the_url.split("/")[-1])
 				for names in file_names:
 					filenames = names
-					get_files = requests.get(url, stream=True, verify=True)
+					get_files = requests.get(url, stream=True, verify=True, headers=HEADERS)
 					print("Downloading " + filenames)
 					with open(filenames, "wb")as outfile:
 						shutil.copyfileobj(get_files.raw, outfile)
@@ -57,7 +57,7 @@ def _8ch_scraper():
 					change_filename = random.randint(1,1000)
 					change_filename = str(change_filename)
 					filenames = change_filename + filenames
-					r = requests.get(media_list, stream=True, verify=True)
+					r = requests.get(media_list, stream=True, verify=True, headers=HEADERS)
 					print("Downloading " + filenames)
 					with open(filenames, "wb") as out_file:
 						shutil.copyfileobj(r.raw, out_file)
@@ -73,7 +73,7 @@ def _4chan_scraper():
 			change_filename = random.randint(1,1000)
 			change_filename = str(change_filename)
 			filenames = change_filename + filenames
-			get_files = requests.get(media_list_url, stream= True, verify=True)
+			get_files = requests.get(media_list_url, stream= True, verify=True, headers=HEADERS)
 			print("Downloading "+ filenames)
 			with open(filenames, "wb")as outfile:
 				shutil.copyfileobj(get_files.raw, outfile)
@@ -88,7 +88,7 @@ def hispanchan():
 				change_filename = random.randint(1,1000)
 				change_filename = str(change_filename)
 				filenames = change_filename + filenames
-				get_files = requests.get(media_list_url, stream=True, verify=True)
+				get_files = requests.get(media_list_url, stream=True, verify=True, headers=HEADERS)
 				print("Downloading "+ filenames)
 				with open(filenames, 'wb')as outfile:
 					shutil.move(filenames, argv[2])
@@ -102,10 +102,25 @@ def endchan():
 		change_filename = random.randint(1, 1000)
 		change_filename = str(change_filename)
 		filenames = change_filename + filenames
-		get_files = requests.get(media_list_url, stream=True, verify=True)
+		get_files = requests.get(media_list_url, stream=True, verify=True, headers=HEADERS)
 		print("Downloading "+ filenames)
 		with open(filenames, 'wb')as outfile:
 			shutil.copyfileobj(get_files.raw, outfile)
+			shutil.move(filenames, argv[2])
+def _16chan():
+	server_status_err()
+	parse_html = BeautifulSoup(url.text, 'lxml')
+	for tags in parse_html.find_all('a', {'class': 'attachment-download'}):
+		media_list_url = tags.get('href')
+		rub = media_list_url.split('?')[-1]
+		media_list_url = media_list_url.replace(rub, '')
+		media_list_url = media_list_url.replace('?', '')
+		media_list_url = "https://16chan.nl%s" %(media_list_url)
+		filenames = media_list_url.split('/')[-1]
+		get_files = requests.get(media_list_url, stream=True, verify=True, headers=HEADERS)
+		print("Downloading "+ filenames)
+		with open(filenames, 'wb')as f:
+			shutil.copyfileobj(get_files.raw, f)
 			shutil.move(filenames, argv[2])
 def main():
 	if (len(argv) > 3) and (os.path.isdir(argv[2]) == False):
@@ -120,6 +135,7 @@ def main():
 			_4chan_scraper()
 			_8ch_scraper()
 			endchan()
+			_16chan()
 if __name__ == "__main__":
 	try:
 		main()

@@ -5,3 +5,12 @@ ifinity-dl downloads all images or videos on 4chan, hispanchan, 8ch, endchan and
 infinity-dl.py [URL] [DIR]
 ```
 ![2016-06-12-211408_960x427_scrot](https://cloud.githubusercontent.com/assets/7110233/15993202/eb3114a2-30e6-11e6-9fd7-a29c7762813a.png)
+
+Supported chan:
+
+* 8ch
+* 4chan
+* enchan
+* 7chan
+* hispanchan
+* 16chan
