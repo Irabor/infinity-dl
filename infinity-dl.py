@@ -65,10 +65,11 @@ def parse_html():
     print("File list: %d" %(len(file_links)))
     for ln in file_links:
         file_ = re_page(ln)
+        fs = len(file_) / 1024
         filenames = ln.split('/')[-1]
         write_file(file_,filenames)
         counter+= 1
-        print("Downloading %s... [%d / %d]"%(filenames, counter, len(file_links)))
+        print("Downloading %s... [%d / %d - %d KB]"%(filenames, counter, len(file_links),fs))
 if __name__ == '__main__':
     try:
         parse_html()
