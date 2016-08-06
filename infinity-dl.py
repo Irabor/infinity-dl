@@ -12,7 +12,7 @@ class Parser(hp):
         for name, value in attrs:
             if name == 'href':
                 self.links.append(value)
-if len(sys.argv) == 2:
+if len(sys.argv) == 3:
     print('Sending request..')
 def re_page(url):
     ua = {
@@ -24,7 +24,7 @@ def re_page(url):
     webpage = page.read()
     return webpage
 def write_file(fh,fn):
-    with open(fn ,'wb')as f:
+    with open(sys.argv[2]+fn ,'wb')as f:
         f.write(fh)
 def parse_html():
     page = re_page(sys.argv[1])

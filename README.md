@@ -4,7 +4,7 @@ ifinity-dl downloads all images or videos on chan threads and saves them in a sp
 ```
 infinity-dl.py [URL] [DIR]
 ```
-![2016-06-12-211408_960x427_scrot](https://cloud.githubusercontent.com/assets/7110233/15993202/eb3114a2-30e6-11e6-9fd7-a29c7762813a.png)
+![2016-08-06-184919_1171x336_scrot](https://cloud.githubusercontent.com/assets/7110233/17457690/e7cb8648-5c07-11e6-823c-ef60b6b72441.png)
 
 Supported chan:
 
