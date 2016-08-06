@@ -20,9 +20,15 @@ def re_page(url):
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
     }
     r = urllib2.Request(url, headers = ua)
-    page = urllib2.urlopen(r)
-    webpage = page.read()
-    return webpage
+    try:
+        page = urllib2.urlopen(r)
+    except urllib2.HTTPError,e:
+        print('[HTTP error]: %s ' %e.reason)
+        sys.exit()
+    else:
+        page = urllib2.urlopen(r)
+        webpage = page.read()
+        return webpage
 def write_file(fh,fn):
     with open(sys.argv[2]+fn ,'wb')as f:
         f.write(fh)
@@ -38,6 +44,7 @@ def parse_html():
     al = []
     counter = 0
     lu = urlparse(sys.argv[1])
+    base = "%s://%s"%(lu.scheme, lu.netloc)
     for i in links:
         for n in fe:
             if n in i:
@@ -49,9 +56,12 @@ def parse_html():
         url = urlparse(i)
         if url.scheme and (not url.query):
             file_links.append(i)
-        elif not url.scheme:
+        elif not url.scheme and ('//' in i):
             file_links.append(lu.scheme+':'+i)
-    #print media_links
+        else:
+            if '//' not in i and (not url.query):
+                file_links.append(base+i)
+    #print file_links
     print("File list: %d" %(len(file_links)))
     for ln in file_links:
         file_ = re_page(ln)
