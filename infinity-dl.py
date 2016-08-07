@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import division
 from HTMLParser import HTMLParser as hp
 import sys
 import urllib2
@@ -32,6 +33,34 @@ def re_page(url):
 def write_file(fh,fn):
     with open(sys.argv[2]+fn ,'wb')as f:
         f.write(fh)
+def calc_size(size):
+    if size > 1024:
+        size = size /1024
+        ch = size % 2
+        if ch == 0:
+            size = "%d MB"%(size)
+            return size
+        else:
+            size = "%1.2f MB"%(size)
+            size = str(size)
+            return size
+    else:
+        size = '%d KB'%(size)
+        return size
+def tfs(size):
+    size = size / 1024
+    if size > 1024:
+        size = size /1024
+        ch = size % 2
+        if ch == 0:
+            size = '%d MB'%(size)
+            return size
+        else:
+            size = '%1.2f MB'%(size)
+            return size
+    else:
+        size = '%d KB'%(size)
+        return size
 def parse_html():
     page = re_page(sys.argv[1])
     pg = Parser()
@@ -43,6 +72,8 @@ def parse_html():
     file_links = []
     al = []
     counter = 0
+    total_size = ''
+    sf = 0
     lu = urlparse(sys.argv[1])
     base = "%s://%s"%(lu.scheme, lu.netloc)
     for i in links:
@@ -56,7 +87,7 @@ def parse_html():
         url = urlparse(i)
         if url.scheme and (not url.query):
             file_links.append(i)
-        elif not url.scheme and ('//' in i):
+        elif not url.scheme and ('//' in i) and (not url.query):
             file_links.append(lu.scheme+':'+i)
         else:
             if '//' not in i and (not url.query):
@@ -66,10 +97,15 @@ def parse_html():
     for ln in file_links:
         file_ = re_page(ln)
         fs = len(file_) / 1024
+        sf += len(file_)
+        fs = calc_size(fs)
         filenames = ln.split('/')[-1]
         write_file(file_,filenames)
         counter+= 1
-        print("Downloading %s... [%d / %d - %d KB]"%(filenames, counter, len(file_links),fs))
+        print("Downloading %s... [%d / %d - %s]"%(filenames, counter, len(file_links),fs))
+
+    total_size = tfs(sf)
+    print('Total size: %s'%(total_size))
 if __name__ == '__main__':
     try:
         parse_html()
