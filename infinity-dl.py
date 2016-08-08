@@ -4,7 +4,6 @@ from HTMLParser import HTMLParser as hp
 import sys
 import urllib2
 from urlparse import urlparse
-import requests
 class Parser(hp):
     def __init__(self):
         hp.__init__(self)
