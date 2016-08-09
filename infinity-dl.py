@@ -1,9 +1,20 @@
 #!/usr/bin/env python
+#Copyright (c) 2016 Irabor
+
+#Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+#The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+#This script scraps media files from imageboard threads
+
 from __future__ import division
 from HTMLParser import HTMLParser as hp
 import sys
 import urllib2
 from urlparse import urlparse
+import requests
 class Parser(hp):
     def __init__(self):
         hp.__init__(self)
@@ -23,7 +34,7 @@ def re_page(url):
     try:
         page = urllib2.urlopen(r)
     except urllib2.HTTPError,e:
-        print('[HTTP error]: %s ' %e.reason)
+        print('[HTTP error]: %s \n Check your url' %e.reason)
         sys.exit()
     else:
         page = urllib2.urlopen(r)
@@ -92,7 +103,7 @@ def parse_html():
             if '//' not in i and (not url.query):
                 file_links.append(base+i)
     #print file_links
-    print("File list: %d" %(len(file_links)))
+    print("Media list: %d" %(len(file_links)))
     for ln in file_links:
         file_ = re_page(ln)
         fs = len(file_) / 1024
@@ -101,14 +112,14 @@ def parse_html():
         filenames = ln.split('/')[-1]
         write_file(file_,filenames)
         counter+= 1
-        print("Downloading %s... [%d / %d - %s]"%(filenames, counter, len(file_links),fs))
-
+        print("[Downloading] %s %d / %d - %s"%(filenames, counter, len(file_links),fs))
     total_size = tfs(sf)
-    print('Total size: %s'%(total_size))
+    print('[Finished] Total size: %s'%(total_size))
 if __name__ == '__main__':
     try:
-        parse_html()
+       parse_html()
     except KeyboardInterrupt:
+        print('\n[Abortion] Download aborted')
         sys.exit()
     except IndexError:
-        print('Usage: %s [URL]'%(sys.argv[0]))
+        print('Usage: %s [URL] [DIR]'%(sys.argv[0]))
