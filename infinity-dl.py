@@ -11,6 +11,7 @@
 from __future__ import division
 from HTMLParser import HTMLParser as hp
 import sys
+import platform
 import urllib2
 from urlparse import urlparse
 class Parser(hp):
@@ -39,7 +40,20 @@ def re_page(url):
         webpage = page.read()
         return webpage
 def write_file(fh,fn):
-    with open(sys.argv[2]+fn ,'wb')as f:
+    path = sys.argv[2]
+    x = []
+    for i in path:
+        x.append(i)
+    if platform.system() == 'Linux':
+        if x[-1] != '/':
+            x.append('/')
+    elif platform.system() == 'Windows':
+        if x[-1] != '\\':
+            x.append('\\')
+    path = ''
+    for i in x:
+        path +=i
+    with open(path+fn ,'wb')as f:
         f.write(fh)
 def calc_size(size):
     if size > 1024:
