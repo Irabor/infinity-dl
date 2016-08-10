@@ -1,6 +1,6 @@
 # infinity-dl
 ### Description
-ifinity-dl downloads all images or videos on imageboard threads and saves them in a specified directory
+infinity-dl downloads all media files in imageboard threads and saves them in a specified directory
 ```
 Usage: infinity-dl.py [URL] [DIR]
 ```
