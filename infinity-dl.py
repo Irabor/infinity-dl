@@ -13,6 +13,7 @@ from HTMLParser import HTMLParser as hp
 import sys
 import platform
 import urllib2
+import time
 from urlparse import urlparse
 class Parser(hp):
     def __init__(self):
@@ -22,9 +23,20 @@ class Parser(hp):
         for name, value in attrs:
             if name == 'href':
                 self.links.append(value)
-if len(sys.argv) == 3:
-    print('Sending request..')
+def handle_argv():
+    url = urlparse(sys.argv[1])
+    url = url.netloc == '' and url.scheme ==''
+    if len(sys.argv) == 3 and url == False:
+        print('Sending request..')
+    elif sys.argv[0].find('/') > -1 or  len(sys.argv) < 3:
+        script = sys.argv[0].split('/')[-1]
+        print('Usage: %s [URL] [DIR]'%(script))
+        sys.exit()
+    else:
+        print('Usage: %s [URL] [DIR]'%(sys.argv[0]))
+        sys.exit()
 def re_page(url):
+    handle_argv()
     ua = {
     'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/530.5 (KHTML, like Gecko) Chrome/2.0.173.1 Safari/530.5',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
@@ -34,7 +46,6 @@ def re_page(url):
         page = urllib2.urlopen(r)
     except urllib2.HTTPError,e:
         print('[HTTP error]: %s \n Check your url' %e.reason)
-        sys.exit()
     else:
         page = urllib2.urlopen(r)
         webpage = page.read()
@@ -93,9 +104,6 @@ def parse_html():
     media_links = []
     file_links = []
     al = []
-    counter = 0
-    total_size = ''
-    sf = 0
     lu = urlparse(sys.argv[1])
     base = "%s://%s"%(lu.scheme, lu.netloc)
     for i in links:
@@ -114,9 +122,17 @@ def parse_html():
         else:
             if '//' not in i and (not url.query):
                 file_links.append(base+i)
+    return file_links
+def dl_files():
+    file_links = []
+    file_links = parse_html()
+    sf = 0
+    counter = 0
+    total_size = ''
     #print file_links
     print("Media list: %d" %(len(file_links)))
     for ln in file_links:
+        time.sleep(0.3)
         file_ = re_page(ln)
         fs = len(file_) / 1024
         sf += len(file_)
@@ -127,11 +143,13 @@ def parse_html():
         print("[Downloading] %s %d / %d - %s"%(filenames, counter, len(file_links),fs))
     total_size = tfs(sf)
     print('[Finished] Total size: %s'%(total_size))
-if __name__ == '__main__':
+def main():
     try:
-       parse_html()
+       dl_files()
     except KeyboardInterrupt:
         print('\n[Abortion] Download aborted')
         sys.exit()
     except IndexError:
-        print('Usage: %s [URL] [DIR]'%(sys.argv[0]))
+        handle_argv()
+if __name__ == '__main__':
+    main()
