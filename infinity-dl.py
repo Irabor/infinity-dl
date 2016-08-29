@@ -36,7 +36,6 @@ def handle_argv():
         print('Usage: %s [URL] [DIR]'%(sys.argv[0]))
         sys.exit()
 def re_page(url):
-    handle_argv()
     ua = {
     'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/530.5 (KHTML, like Gecko) Chrome/2.0.173.1 Safari/530.5',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
@@ -145,7 +144,8 @@ def dl_files():
     print('[Finished] Total size: %s'%(total_size))
 def main():
     try:
-       dl_files()
+        handle_argv()
+        dl_files()
     except KeyboardInterrupt:
         print('\n[Abortion] Download aborted')
         sys.exit()
