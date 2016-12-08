@@ -24,16 +24,20 @@ class Parser(hp):
             if name == 'href':
                 self.links.append(value)
 def handle_argv():
-    url = urlparse(sys.argv[1])
-    url = url.netloc == '' and url.scheme ==''
-    if len(sys.argv) == 3 and url == False:
-        print('Sending request..')
-    elif sys.argv[0].find('/') > -1 or  len(sys.argv) < 3:
-        script = sys.argv[0].split('/')[-1]
-        print('Usage: %s [URL] [DIR]'%(script))
-        sys.exit()
-    else:
-        print('Usage: %s [URL] [DIR]'%(sys.argv[0]))
+    try:
+        url = urlparse(sys.argv[1])
+        url = url.netloc == '' and url.scheme ==''
+        if len(sys.argv) == 3 and url == False:
+            print('Sending request..')
+        elif sys.argv[0].find('/') > -1 or  len(sys.argv) < 3 or len(sys.argv) < 1:
+            script = sys.argv[0].split('/')[-1]
+            print('Usage: %s [URL] [DIR]'%(script))
+            sys.exit()
+        else:
+            print('Usage: %s [URL] [DIR]'%(sys.argv[0]))
+            sys.exit()
+    except IndexError:
+        print('Usage: %s [URL] [DIR]'%(sys.argv[0].split('/')[-1]))
         sys.exit()
 def re_page(url):
     ua = {
